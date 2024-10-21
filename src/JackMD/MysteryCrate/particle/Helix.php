@@ -35,7 +35,7 @@ declare(strict_types=1);
 namespace JackMD\MysteryCrate\particle;
 
 use JackMD\MysteryCrate\Main;
-use pocketmine\level\particle\FlameParticle;
+use pocketmine\world\particle\FlameParticle;
 use pocketmine\math\Vector3;
 use pocketmine\scheduler\Task;
 
@@ -60,8 +60,8 @@ class Helix extends Task{
 	/**
 	 * @param int $tick
 	 */
-	public function onRun(int $tick){
-		$level = $this->plugin->getServer()->getLevelByName((string) $this->plugin->getConfig()->get("crateWorld"));
+	public function onRun() : void{
+		$level = $this->plugin->getServer()->getWorldManager()->getWorldByName((string) $this->plugin->getConfig()->get("crateWorld"));
 		$cpos = $this->pos;
 		$radio = 1;
 		for($y = 0; $y < 2; $y += 0.2){
