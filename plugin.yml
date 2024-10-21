@@ -3,10 +3,10 @@ main: JackMD\MysteryCrate\Main
 api: [3.9.0]
 version: 9.2.0
 author: JackMD
-authors: [DaPigGuy]
+authors: [DaPigGuy, WavyCraftNetwork, Terpz710]
 load: POSTWORLD
 description: Add unlimited number of MysteryCrates with full customization.
-website: https://github.com/JackMD/MysteryCrate
+website: https://github.com/WavyCraftNetwork/MysteryCrate
 
 permissions:
  mc.crates.use:
