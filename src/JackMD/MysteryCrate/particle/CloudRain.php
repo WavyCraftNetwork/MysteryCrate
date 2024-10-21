@@ -35,8 +35,8 @@ declare(strict_types=1);
 namespace JackMD\MysteryCrate\particle;
 
 use JackMD\MysteryCrate\Main;
-use pocketmine\level\particle\ExplodeParticle;
-use pocketmine\level\particle\WaterDripParticle;
+use pocketmine\world\particle\ExplodeParticle;
+use pocketmine\world\particle\WaterDripParticle;
 use pocketmine\math\Vector3;
 use pocketmine\scheduler\Task;
 
@@ -61,8 +61,8 @@ class CloudRain extends Task{
 	/**
 	 * @param int $tick
 	 */
-	public function onRun(int $tick){
-		$level = $this->plugin->getServer()->getLevelByName((string) $this->plugin->getConfig()->get("crateWorld"));
+	public function onRun() : void{
+		$level = $this->plugin->getServer()->getWorldManager()->getWorldByName((string) $this->plugin->getConfig()->get("crateWorld"));
 		$cpos = $this->pos;
 		$time = 1;
 		$pi = 3.14159;
