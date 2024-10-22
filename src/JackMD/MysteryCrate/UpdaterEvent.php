@@ -47,7 +47,7 @@ use pocketmine\item\Item;
 use pocketmine\level\sound\ClickSound;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\nbt\tag\StringTag;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\scheduler\Task;
 
 class UpdaterEvent extends Task{
@@ -92,8 +92,8 @@ class UpdaterEvent extends Task{
 	public function closeInventory(Player $player, BaseFakeInventory $inventory){
 		if((!is_null($this->getHandler())) && (!$this->getHandler()->isCancelled())){
 			$chestBlock = $this->chestBlock;
-			$typeBlock = $chestBlock->getLevel()->getBlock($chestBlock->subtract(0, 1));
-			$type = $this->plugin->isCrateBlock($typeBlock->getId(), $typeBlock->getDamage());
+			$typeBlock = $chestBlock->getWorld()->getBlock($chestBlock->getPostion()->subtract(0, 1));
+			$type = $this->plugin->isCrateBlock($typeBlock->getTypeId());
 			$reward = $this->getReward();
 
 			if($player->isOnline()){
@@ -136,7 +136,7 @@ class UpdaterEvent extends Task{
 		$chestBlock = $this->chestBlock;
 		$player = $this->player;
 
-		$typeBlock = $chestBlock->getLevel()->getBlock($chestBlock->subtract(0, 1));
+		$typeBlock = $chestBlock->getWorld()->getBlock($chestBlock->subtract(0, 1));
 		$type = $this->plugin->isCrateBlock($typeBlock->getId(), $typeBlock->getDamage());
 		$drops = $this->plugin->getCrateDrops($type);
 
