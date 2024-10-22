@@ -42,6 +42,8 @@ use pocketmine\utils\TextFormat;
 
 class KeyCommand extends Command{
 
+    private $plugin;
+
     /**
      * KeyCommand constructor.
      *
@@ -52,6 +54,8 @@ class KeyCommand extends Command{
         $this->setDescription("Give a crate key to a player.");
         $this->setUsage("/key [type] [player] [amount]");
         $this->setPermission("mc.command.key");
+
+        $this->plugin = $plugin;
     }
 
     /**
@@ -65,7 +69,7 @@ class KeyCommand extends Command{
             return true;
         }
 
-        $plugin = $this->getPlugin();
+        $plugin = $this->plugin;
         $target = isset($args[1]) ? $plugin->getServer()->getPlayer($args[1]) : $sender;
 
         if($target instanceof Player){
@@ -90,7 +94,7 @@ class KeyCommand extends Command{
     private function checkArgs(array $args, CommandSender $sender): bool{
         if(!isset($args[0])){
             $sender->sendMessage(TextFormat::RED . "Usage: /key [type] [player] [amount]");
-        }elseif(!$this->getPlugin()->getCrateType(strtolower($args[0]))){
+        }elseif(!$this->plugin->getCrateType(strtolower($args[0]))){
             $sender->sendMessage(TextFormat::RED . "Invalid crate type.");
         }else{
             return false;
