@@ -50,7 +50,7 @@ class KeyAllCommand extends Command{
 	 * @param Main $plugin
 	 */
 	public function __construct(Main $plugin){
-		parent::__construct("keyall", $plugin);
+		parent::__construct("keyall");
 		$this->setDescription("Give a crate key to all the players on the server.");
 		$this->setUsage("/keyall [type] [amount]");
 		$this->setPermission("mc.command.keyall");
