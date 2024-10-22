@@ -36,10 +36,10 @@ namespace JackMD\MysteryCrate\command;
 
 use JackMD\MysteryCrate\Main;
 use pocketmine\command\CommandSender;
-use pocketmine\command\PluginCommand;
+use pocketmine\command\Command;
 use pocketmine\utils\TextFormat;
 
-class KeyAllCommand extends PluginCommand{
+class KeyAllCommand extends Command{
 
 	/** @var Main */
 	private $plugin;
