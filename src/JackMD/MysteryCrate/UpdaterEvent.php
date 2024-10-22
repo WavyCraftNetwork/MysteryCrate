@@ -40,11 +40,14 @@ use JackMD\MysteryCrate\lang\Lang;
 use muqsit\invmenu\inventories\BaseFakeInventory;
 use muqsit\invmenu\InvMenu;
 use pocketmine\block\Block;
+use pocketmine\block\VanillaBlocks;
 use pocketmine\command\ConsoleCommandSender;
-use pocketmine\item\enchantment\Enchantment;
+use pocketmine\item\enchantment\StringToEnchantmentParser;
 use pocketmine\item\enchantment\EnchantmentInstance;
 use pocketmine\item\Item;
-use pocketmine\level\sound\ClickSound;
+use pocketmine\item\VanillaItems;
+use pocketmine\item\StringToItemParser;
+use pocketmine\world\sound\ClickSound;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\nbt\tag\StringTag;
 use pocketmine\player\Player;
@@ -110,10 +113,10 @@ class UpdaterEvent extends Task{
 	 * @param string $type
 	 */
 	public function rewardPlayer(Player $player, Item $item, string $type){
-		if($item->getDamage() === $this->plugin->getConfig()->get("commandMeta")){
+		if($this->plugin->getConfig()->get("commandMeta")){
 			$nbt = $item->getNamedTag();
 			for($i = 0; $i < $this->plugin->getConfig()->get("maxCommands"); $i++){
-				if($nbt->hasTag((string) $i, StringTag::class)){
+				if($nbt->getTag((string) $i, StringTag::class)){
 					$cmd = $nbt->getString((string) $i);
 					$this->plugin->getServer()->dispatchCommand(new ConsoleCommandSender(), $cmd);
 				}
@@ -136,21 +139,23 @@ class UpdaterEvent extends Task{
 		$chestBlock = $this->chestBlock;
 		$player = $this->player;
 
-		$typeBlock = $chestBlock->getWorld()->getBlock($chestBlock->subtract(0, 1));
-		$type = $this->plugin->isCrateBlock($typeBlock->getId(), $typeBlock->getDamage());
+		$typeBlock = $chestBlock->getWorld()->getBlock($chestBlock->getPosition()->subtract(0, 1));
+		$type = $this->plugin->isCrateBlock($typeBlock->getTypeId());
 		$drops = $this->plugin->getCrateDrops($type);
 
 		$reward = array_rand($drops, 1);
 		$reward = $drops[$reward];
 
-		if(!isset($reward["id"]) || !isset($reward["meta"]) || !isset($reward["amount"])){
+		if(!isset($reward["id"]) || !isset($reward["amount"])){
 			$this->player->kick("§cMysteryCrate caught fire!\nPlease report to Admin to look for error on console.", false);
 			$this->plugin->getLogger()->error("Either `id` or `meta` or `amount` key is missing in " . ucfirst($type) . " Crate.");
 			$this->plugin->getServer()->getPluginManager()->disablePlugin($this->plugin);
 		}
 
-		$item = Item::get($reward["id"], $reward["meta"], $reward["amount"]);
-
+		$item = StringToItemParser::getInstance()->parse($reward["id"]);
+                if(isset($reward["amount"])){
+			$item->setCount($reward["amount"]);
+		}
 		if(isset($reward["name"])){
 			$item->setCustomName($reward["name"]);
 		}
@@ -169,7 +174,7 @@ class UpdaterEvent extends Task{
 			foreach($reward["enchantments"] as $enchantName => $enchantData){
 				$level = $enchantData["level"];
 				$ce = $this->plugin->getServer()->getPluginManager()->getPlugin("PiggyCustomEnchants");
-				if(!is_null($enchant = Enchantment::getEnchantmentByName($enchantName)) || (!is_null($ce) && $ce->isEnabled() && !is_null($enchant = CustomEnchantManager::getEnchantmentByName($enchantName)))){
+				if(!is_null($enchant = StringToEnchantmentParser::getInstance()->parse($enchantName)) || (!is_null($ce) && $ce->isEnabled() && !is_null($enchant = CustomEnchantManager::getEnchantmentByName($enchantName)))){
 					$item->addEnchantment(new EnchantmentInstance($enchant, $level));
 				}
 			}
@@ -181,7 +186,7 @@ class UpdaterEvent extends Task{
 	/**
 	 * @param int $timer
 	 */
-	public function onRun(int $timer){
+	public function onRun() : void{
 		$t_delay = $this->t_delay;
 		$chestBlock = $this->chestBlock;
 		$player = $this->player;
@@ -196,13 +201,13 @@ class UpdaterEvent extends Task{
 				$i = 0;
 				while($i < 27){
 					if($i !== 4 && $i !== 10 && $i !== 11 && $i !== 12 && $i !== 13 && $i !== 14 && $i !== 15 && $i !== 16 && $i !== 22){
-						$this->setItem($i, Item::get(Item::VINE));
+						$this->setItem($i, VanillaBlocks::VINE()->asItem());
 					}
 					$i++;
 				}
 
-				$this->setItem(4, Item::get(Item::END_ROD));
-				$this->setItem(22, Item::get(Item::END_ROD));
+				$this->setItem(4, VanillaBlocks::END_ROD()->asItem());
+				$this->setItem(22, VanillaBlocks::END_ROD()->asItem());
 
 				$chestBlock->getLevel()->addSound(new ClickSound($chestBlock), [$player]);
 
@@ -217,17 +222,17 @@ class UpdaterEvent extends Task{
 			}
 
 			if($t_delay == -1){
-				$this->setItem(10, Item::get(Item::AIR));
-				$this->setItem(11, Item::get(Item::AIR));
-				$this->setItem(12, Item::get(Item::AIR));
-				$this->setItem(14, Item::get(Item::AIR));
-				$this->setItem(15, Item::get(Item::AIR));
-				$this->setItem(16, Item::get(Item::AIR));
+				$this->setItem(10, VanillaItems::AIR());
+				$this->setItem(11, VanillaItems::AIR());
+				$this->setItem(12, VanillaItems::AIR());
+				$this->setItem(14, VanillaItems::AIR());
+				$this->setItem(15, VanillaItems::AIR());
+				$this->setItem(16, VanillaItems::AIR());
 
 				$reward = $crateInventory->getItem(13);
 
-				$typeBlock = $chestBlock->getLevel()->getBlock($chestBlock->subtract(0, 1));
-				$type = $this->plugin->isCrateBlock($typeBlock->getId(), $typeBlock->getDamage());
+				$typeBlock = $chestBlock->getWorld()->getBlock($chestBlock->getPosition()->subtract(0, 1));
+				$type = $this->plugin->isCrateBlock($typeBlock->getTypeId());
 
 				if($player->isOnline()){
 					$this->rewardPlayer($player, $reward, $type);
