@@ -307,7 +307,7 @@ class Main extends PluginBase{
 		$key = StringToItemParser::getInstance()->parse($keyID);
 		$key->setCount($amount);
 		$key->setLore([$this->getConfig()->get("lore")]);
-		$key->addEnchantment(new EnchantmentInstance(VanillaEnchantments::FORTUNE(), 1)));
+		$key->addEnchantment(new EnchantmentInstance(VanillaEnchantments::FORTUNE(), 1));
 		$key->setCustomName(ucfirst($type . " Key"));
 		$key->setNamedTag(new StringTag("KeyType", $type));
 
