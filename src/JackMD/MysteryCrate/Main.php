@@ -245,7 +245,7 @@ class Main extends PluginBase{
 	 * @return null|array
 	 */
 	public function getCrateBlock(string $type){
-		return $this->getCrateDrops($type) ? $this->crateBlocks[$type] : null;
+		return $this->getCrateDrops[$type] ? $this->crateBlocks[$type] : null;
 	}
 
 	/**
@@ -253,7 +253,7 @@ class Main extends PluginBase{
 	 * @return null|array
 	 */
 	public function getCrateDrops(string $type){
-		return $this->getCrateType($type) ? $this->crateDrops[$type] : null;
+		return $this->getCrateType[$type] ? $this->crateDrops[$type] : null;
 	}
 
 	/**
@@ -262,7 +262,7 @@ class Main extends PluginBase{
 	 * @return bool|string
 	 */
 	public function isCrateBlock(int $id){
-		return isset($this->crateBlocks($id)) ? $this->crateBlocks($id) : false;
+		return isset($this->crateBlocks[$id]) ? $this->crateBlocks[$id] : false;
 	}
 
 	/**
