@@ -35,7 +35,6 @@ declare(strict_types = 1);
 
 namespace JackMD\MysteryCrate;
 
-use JackMD\ConfigUpdater\ConfigUpdater;
 use JackMD\MysteryCrate\command\KeyAllCommand;
 use JackMD\MysteryCrate\command\KeyCommand;
 use JackMD\MysteryCrate\lang\Lang;
@@ -45,16 +44,15 @@ use JackMD\MysteryCrate\particle\DoubleHelix;
 use JackMD\MysteryCrate\particle\Helix;
 use JackMD\MysteryCrate\particle\ParticleType;
 use JackMD\MysteryCrate\particle\Ting;
-use JackMD\UpdateNotifier\UpdateNotifier;
 use muqsit\invmenu\InvMenu;
 use muqsit\invmenu\InvMenuHandler;
-use pocketmine\item\enchantment\Enchantment;
+use pocketmine\item\enchantment\VanillaEnchantments;
 use pocketmine\item\enchantment\EnchantmentInstance;
 use pocketmine\item\Item;
-use pocketmine\level\particle\FloatingTextParticle;
+use pocketmine\world\particle\FloatingTextParticle;
 use pocketmine\math\Vector3;
 use pocketmine\nbt\tag\StringTag;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\plugin\PluginBase;
 use pocketmine\utils\Config;
 use pocketmine\utils\TextFormat;
@@ -83,21 +81,16 @@ class Main extends PluginBase{
 
 	private function performChecks(): void{
 		$this->checkVirions();
-
 		Lang::init($this);
-
 		$this->saveDefaultConfig();
 		$this->initCrates();
-		$this->checkConfigs();
-
-		UpdateNotifier::checkUpdate($this, $this->getDescription()->getName(), $this->getDescription()->getVersion());
 	}
 
 	/**
 	 * Checks if the required virions/libraries are present before enabling the plugin.
 	 */
 	private function checkVirions(): void{
-		if(!class_exists(UpdateNotifier::class) || !class_exists(InvMenu::class) || !class_exists(ConfigUpdater::class)){
+		if(!class_exists(InvMenu::class)){
 			throw new \RuntimeException("MysteryCrate plugin will only work if you use the plugin phar from Poggit.");
 		}
 	}
@@ -117,15 +110,6 @@ class Main extends PluginBase{
 		}
 	}
 
-	/**
-	 * Check if the configs are up-to-date.
-	 */
-	private function checkConfigs(): void{
-		$cratesConfig = new Config($this->getDataFolder() . "crates.yml", Config::YAML);
-
-		ConfigUpdater::checkUpdate($this, $cratesConfig, "crates-version", self::CRATES_VERSION);
-		ConfigUpdater::checkUpdate($this, $this->getConfig(), "config-version", self::CONFIG_VERSION);
-	}
 
 	public function onEnable(): void{
 		$this->performChecks();
@@ -146,10 +130,10 @@ class Main extends PluginBase{
 	private function initParticles(): void{
 		if($this->getConfig()->get("showParticle")){
 			$crateWorld = (string) $this->getConfig()->get("crateWorld");
-			if(!$this->getServer()->isLevelLoaded($crateWorld)){
-				$this->getServer()->loadLevel($crateWorld);
+			if(!$this->getServer()->getWorldManager()->isWorldLoaded($crateWorld)){
+				$this->getServer()->getWorldManager()->loadWorld($crateWorld);
 			}
-			if($this->getServer()->getLevelByName($crateWorld) !== null){
+			if($this->getServer()->getWorldManager()->getWorldByName($crateWorld) !== null){
 				$this->initParticleShow();
 			}else{
 				$this->getServer()->getLogger()->critical("Please set the crateWorld in the config.yml. Or make sure that the world exists and is loaded.");
@@ -216,7 +200,7 @@ class Main extends PluginBase{
 				if($particle instanceof FloatingTextParticle){
 					foreach($particle->encode() as $packet){
 						$particle->setInvisible(false);
-						$player->dataPacket($packet);
+						$player->getNetworkSession()->sendDataPacket($packet)
 					}
 				}
 			}
@@ -277,8 +261,8 @@ class Main extends PluginBase{
 	 * @param int $meta
 	 * @return bool|string
 	 */
-	public function isCrateBlock(int $id, int $meta){
-		return isset($this->crateBlocks[$id . ":" . $meta]) ? $this->crateBlocks[$id . ":" . $meta] : false;
+	public function isCrateBlock(int $id){
+		return isset($this->crateBlocks($id)) ? $this->crateBlocks($id) : false;
 	}
 
 	/**
@@ -288,7 +272,7 @@ class Main extends PluginBase{
 	public function isCrateKey(Item $item){
 		$values = explode(":", $this->getConfig()->getNested("key"));
 
-		return ((int) $values[0] === $item->getId()) && ((int) $values[1] === $item->getDamage()) && (!is_null($keyType = $item->getNamedTagEntry("KeyType"))) ? $keyType->getValue() : false;
+		return ((int) $values[0] === $item->getTypeId()) && (!is_null($keyType = $item->getNamedTagEntry("KeyType"))) ? $keyType->getValue() : false;
 	}
 
 	/**
@@ -320,12 +304,12 @@ class Main extends PluginBase{
 
 		$keyID = (string) $this->getConfig()->get("key");
 
-		$key = Item::fromString($keyID);
+		$key = StringToItemParser::getInstance()->parse($keyID);
 		$key->setCount($amount);
 		$key->setLore([$this->getConfig()->get("lore")]);
-		$key->addEnchantment(new EnchantmentInstance(new Enchantment(255, "", Enchantment::RARITY_COMMON, Enchantment::SLOT_ALL, Enchantment::SLOT_NONE, 1)));
+		$key->addEnchantment(new EnchantmentInstance(VanillaEnchantments::FORTUNE(), 1)));
 		$key->setCustomName(ucfirst($type . " Key"));
-		$key->setNamedTagEntry(new StringTag("KeyType", $type));
+		$key->setNamedTag(new StringTag("KeyType", $type));
 
 		$player->getInventory()->addItem($key);
 
