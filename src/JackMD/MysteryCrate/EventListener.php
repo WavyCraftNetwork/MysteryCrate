@@ -40,7 +40,7 @@ use pocketmine\block\BlockTypeIds;
 use pocketmine\command\ConsoleCommandSender;
 use pocketmine\event\block\BlockBreakEvent;
 use pocketmine\event\block\BlockPlaceEvent;
-use pocketmine\event\entity\EntityLevelChangeEvent;
+use pocketmine\event\entity\EntityTeleportEvent;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerInteractEvent;
 use pocketmine\event\player\PlayerJoinEvent;
@@ -221,26 +221,27 @@ class EventListener implements Listener{
 	/**
 	 * @param EntityLevelChangeEvent $event
 	 */
-	public function onLevelChange(EntityLevelChangeEvent $event){
-		$targetLevel = $event->getTarget();
-		$crateLevel = $this->plugin->getConfig()->get("crateWorld");
-		if(!empty($this->plugin->getTextParticles())){
-			$particles = $this->plugin->getTextParticles();
-			foreach($particles as $particle){
-				if($particle instanceof FloatingTextParticle){
-					if($targetLevel->getFolderName() === $crateLevel){
-						$particle->setInvisible(false);
-						$lev = $event->getTarget();
-						$lev->addParticle($particle, [$event->getEntity()]);
-					}else{
-						$particle->setInvisible(true);
-						$lev = $event->getOrigin();
-						$lev->addParticle($particle, [$event->getEntity()]);
-					}
-				}
-			}
-		}
-	}
+	public function onLevelChange(EntityTeleportEvent $event) {
+            $targetLevel = $event->getTo(); // Correctly reference the target level (destination)
+            $crateLevel = $this->plugin->getConfig()->get("crateWorld");
+
+            if (!empty($this->plugin->getTextParticles())) {
+                $particles = $this->plugin->getTextParticles();
+
+                foreach ($particles as $particle) {
+                    if ($particle instanceof FloatingTextParticle) {
+                        if ($targetLevel->getFolderName() === $crateLevel) {
+                            $particle->setInvisible(false); // Show particle
+                            $targetLevel->addParticle($particle, [$event->getEntity()]);
+                        } else {
+                            $particle->setInvisible(true); // Hide particle
+                            $targetLevel->addParticle($particle, [$event->getEntity()]);
+                        }
+                  }
+              }
+        }
+    }
+
 
 	/**
 	 * @param PlayerJoinEvent $event
