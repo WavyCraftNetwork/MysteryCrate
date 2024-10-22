@@ -70,7 +70,7 @@ class KeyCommand extends Command{
         }
 
         $plugin = $this->plugin;
-        $target = isset($args[1]) ? $plugin->getServer()->getPlayer($args[1]) : $sender;
+        $target = isset($args[1]) ? $plugin->getServer()->getPlayerByPrefix($args[1]) : $sender;
 
         if($target instanceof Player){
             $keyAmount = (isset($args[2]) and is_numeric($args[2])) ? (int) $args[2] : 1;
