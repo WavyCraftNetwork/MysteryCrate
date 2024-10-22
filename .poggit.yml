@@ -4,14 +4,9 @@ branches:
 projects:
   MysteryCrate:
     path: ""
-    lint:
-      phpstan: false
+    lint: false
     icon: meta/MysteryCrate.png
     libs:
-      - src: JackMD/UpdateNotifier/UpdateNotifier
-        version: ^1.0.0
       - src: muqsit/InvMenu/InvMenu
-        version: ^2.0.0
-      - src: JackMD/ConfigUpdater/ConfigUpdater
-        version: ^1.0.0
+        version: ^4.6.5
 ...
