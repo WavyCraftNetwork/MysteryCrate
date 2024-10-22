@@ -167,7 +167,7 @@ class EventListener implements Listener{
 		$level = $this->plugin->getServer()->getWorldManager()->getWorldByName((string) $this->plugin->getConfig()->get("crateWorld"));
 		$player = $event->getPlayer();
 		$block = $event->getBlock();
-		$typeBlock = $block->getPosition()->getWorld()->getBlock($block->subtract(0, 1));
+		$typeBlock = $block->getPosition()->getWorld()->getBlock($block->getPosition()->subtract(0, 1));
 		$item = $event->getItem();
 		if($player->getWorld() === $level){
 			if((in_array($block->getTypeId(), self::CRATE_BLOCKS)) && ($type = $this->plugin->isCrateBlock($typeBlock->getTypeId())) !== false){
