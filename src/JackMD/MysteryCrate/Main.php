@@ -200,7 +200,7 @@ class Main extends PluginBase{
 				if($particle instanceof FloatingTextParticle){
 					foreach($particle->encode() as $packet){
 						$particle->setInvisible(false);
-						$player->getNetworkSession()->sendDataPacket($packet)
+						$player->getNetworkSession()->sendDataPacket($packet);
 					}
 				}
 			}
