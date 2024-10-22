@@ -80,12 +80,12 @@ class EventListener implements Listener{
 		$level = $this->plugin->getServer()->getWorldManager()->getWorldByName((string) $this->plugin->getConfig()->get("crateWorld"));
 		if(!($player->hasPermission("mc.crates.destroy"))){
 			if($this->plugin->isCrateBlock($block->getTypeId())){
-				if(in_array($block->getPosition()->getWorld()->getBlock($block->getPosition()->add(0, 1))->getTypeId(), self::CRATE_BLOCKS)){
+				if(in_array($block->getPosition()->getWorld()->getBlock($block->getPosition()->add(0, 1, 0))->getTypeId(), self::CRATE_BLOCKS)){
 					$player->sendMessage(Lang::$no_perm_destroy);
 					$event->cancel();
 				}
 			}elseif(in_array($block->getTypeId(), self::CRATE_BLOCKS)){
-				$typeBlock = $block->getPosition()->getWorld()->getBlock($block->getPostion()->subtract(0, 1));
+				$typeBlock = $block->getPosition()->getWorld()->getBlock($block->getPostion()->subtract(0, 1, 0));
 				if($this->plugin->isCrateBlock($typeBlock->getTypeId())){
 					$player->sendMessage(Lang::$no_perm_destroy);
 					$event->cancel();
@@ -94,7 +94,7 @@ class EventListener implements Listener{
 		}else{
 			if(in_array($block->getTypeId(), self::CRATE_BLOCKS)){
 				if($player->getWorld() === $level){
-					$typeBlock = $block->getPosition()->getWorld()->getBlock($block->getPostion()->subtract(0, 1));
+					$typeBlock = $block->getPosition()->getWorld()->getBlock($block->getPostion()->subtract(0, 1, 0));
 					if($type = $this->plugin->isCrateBlock($typeBlock->getTypeId())){
 						$config = $this->plugin->getBlocksConfig();
 						if(!empty($config->get($type))){
@@ -125,12 +125,12 @@ class EventListener implements Listener{
 		$level = $this->plugin->getServer()->getWorldManager()->getWorldByName((string) $this->plugin->getConfig()->get("crateWorld"));
 		if(!($player->hasPermission("mc.crates.create"))){
 			if($this->plugin->isCrateBlock($block->getTypeId())){
-				if(in_array($block->getPosition()->getWorld()->getBlock($block->getPostion()->add(0, 1))->getTypeId(), self::CRATE_BLOCKS)){
+				if(in_array($block->getPosition()->getWorld()->getBlock($block->getPostion()->add(0, 1, 0))->getTypeId(), self::CRATE_BLOCKS)){
 					$player->sendMessage(Lang::$no_perm_create);
 					$event->cancel();
 				}
 			}elseif(in_array($block->getTypeId(), self::CRATE_BLOCKS)){
-				$typeBlock = $block->getPosition()->getWorld()->getBlock($block->getPostion()->subtract(0, 1));
+				$typeBlock = $block->getPosition()->getWorld()->getBlock($block->getPostion()->subtract(0, 1, 0));
 				if($this->plugin->isCrateBlock($typeBlock->getTypeId())){
 					$player->sendMessage(Lang::$no_perm_create);
 					$event->cancel();
@@ -139,7 +139,7 @@ class EventListener implements Listener{
 		}else{
 			if(in_array($block->getTypeId(), self::CRATE_BLOCKS)){
 				if($player->getWorld() === $level){
-					$typeBlock = $block->getPosition()->getWorld()->getBlock($block->getPostion()->subtract(0, 1));
+					$typeBlock = $block->getPosition()->getWorld()->getBlock($block->getPostion()->subtract(0, 1, 0));
 					if($type = $this->plugin->isCrateBlock($typeBlock->getTypeId())){
 						$x = $block->getPostion()->getX();
 						$y = $block->getPostion()->getY();
@@ -167,7 +167,7 @@ class EventListener implements Listener{
 		$level = $this->plugin->getServer()->getWorldManager()->getWorldByName((string) $this->plugin->getConfig()->get("crateWorld"));
 		$player = $event->getPlayer();
 		$block = $event->getBlock();
-		$typeBlock = $block->getPosition()->getWorld()->getBlock($block->getPosition()->subtract(0, 1));
+		$typeBlock = $block->getPosition()->getWorld()->getBlock($block->getPosition()->subtract(0, 1, 0));
 		$item = $event->getItem();
 		if($player->getWorld() === $level){
 			if((in_array($block->getTypeId(), self::CRATE_BLOCKS)) && ($type = $this->plugin->isCrateBlock($typeBlock->getTypeId())) !== false){
