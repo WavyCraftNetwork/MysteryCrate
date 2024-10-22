@@ -164,7 +164,7 @@ class EventListener implements Listener{
 	 * @priority        HIGHEST
 	 */
 	public function onInteract(PlayerInteractEvent $event){
-		$level = $this->plugin->getServer()->getWorldManager->getWorldByName((string) $this->plugin->getConfig()->get("crateWorld"));
+		$level = $this->plugin->getServer()->getWorldManager()->getWorldByName((string) $this->plugin->getConfig()->get("crateWorld"));
 		$player = $event->getPlayer();
 		$block = $event->getBlock();
 		$typeBlock = $block->getWorld()->getBlock($block->subtract(0, 1));
