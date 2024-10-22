@@ -36,12 +36,11 @@ namespace JackMD\MysteryCrate\command;
 
 use JackMD\MysteryCrate\Main;
 use pocketmine\command\CommandSender;
-use pocketmine\command\PluginCommand;
+use pocketmine\command\Command;
 use pocketmine\player\Player;
-use pocketmine\plugin\Plugin;
 use pocketmine\utils\TextFormat;
 
-class KeyCommand extends PluginCommand{
+class KeyCommand extends Command{
 
     /**
      * KeyCommand constructor.
@@ -49,17 +48,10 @@ class KeyCommand extends PluginCommand{
      * @param Main $plugin
      */
     public function __construct(Main $plugin){
-        parent::__construct("key", $plugin);
+        parent::__construct("key");
         $this->setDescription("Give a crate key to a player.");
         $this->setUsage("/key [type] [player] [amount]");
         $this->setPermission("mc.command.key");
-    }
-
-    /**
-     * @return Plugin|Main
-     */
-    public function getPlugin(): Plugin{
-        return parent::getPlugin();
     }
 
     /**
